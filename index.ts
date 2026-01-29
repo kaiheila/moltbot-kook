@@ -1,8 +1,9 @@
 import type { ClawdbotPluginApi } from "clawdbot/plugin-sdk";
 import { emptyPluginConfigSchema } from "clawdbot/plugin-sdk";
+import { kookPlugin } from "./src/channel.js";
+import { setKookRuntime } from "./src/runtime.js";
 
-import { kookPlugin } from "./channel.js";
-import { setKookRuntime } from "./runtime.js";
+export { kookPlugin } from "./src/channel.js";
 
 const plugin = {
   id: "moltbot-kook",
