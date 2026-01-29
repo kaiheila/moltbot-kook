@@ -1,0 +1,68 @@
+{
+  "name": "@kookapp/moltbot-kook",
+  "version": "1.0.0",
+  "description": "Kook channel plugin for Clawdbot",
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts"
+    }
+  },
+  "clawdbot": {
+    "extensions": [
+      "./src/index.ts"
+    ],
+    "channel": {
+      "id": "moltbot-kook",
+      "label": "Kook",
+      "selectionLabel": "Kook",
+      "docsPath": "/channels/kook",
+      "docsLabel": "kook",
+      "blurb": "Kook chat platform integration.",
+      "order": 80
+    },
+    "install": {
+      "npmSpec": "@kookapp/moltbot-kook",
+      "localPath": ".",
+      "defaultChoice": "npm"
+    }
+  },
+  "files": [
+    "src",
+    "clawdbot.plugin.json"
+  ],
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --outfile=index.js --format=esm --platform=node --target=node22 --external:clawdbot --sourcemap",
+    "dev": "esbuild src/index.ts --bundle --watch --outfile=index.js --format=esm --platform=node --target=node22 --external:clawdbot --sourcemap",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "clawdbot",
+    "moltbot",
+    "kook",
+    "chat",
+    "bot",
+    "plugin"
+  ],
+  "author": "Xiaolong Dong",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clawdbot/kook.git"
+  },
+  "bugs": {
+    "url": "https://github.com/clawdbot/kook/issues"
+  },
+  "homepage": "https://github.com/clawdbot/kook",
+  "peerDependencies": {
+    "clawdbot": ">=2026.1.0"
+  },
+  "dependencies": {
+    "ws": "^8.19.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.0"
+  }
+}
