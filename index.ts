@@ -4,6 +4,8 @@ import { kookPlugin } from "./src/channel.js";
 import { setKookRuntime } from "./src/runtime.js";
 
 export { kookPlugin } from "./src/channel.js";
+export { kookOnboardingAdapter } from "./src/onboarding.js";
+export { probeKookAccount } from "./src/probe.js";
 
 const plugin = {
   id: "moltbot-kook",

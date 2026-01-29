@@ -29,6 +29,7 @@
     }
   },
   "files": [
+    "index.ts",
     "src",
     "clawdbot.plugin.json"
   ],
@@ -57,6 +58,7 @@
     "clawdbot": ">=2026.1.0"
   },
   "dependencies": {
-    "ws": "^8.19.0"
+    "ws": "^8.19.0",
+    "zod": "^3.24.1"
   }
 }

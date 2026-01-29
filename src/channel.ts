@@ -3,7 +3,6 @@ import {
   applyAccountNameToChannelSection,
   DEFAULT_ACCOUNT_ID,
   deleteAccountFromConfigSection,
-  emptyPluginConfigSchema,
   formatPairingApproveHint,
   migrateBaseNameToDefaultAccount,
   normalizeAccountId,
@@ -12,6 +11,8 @@ import {
 } from "clawdbot/plugin-sdk";
 
 import { getKookRuntime } from "./runtime.js";
+import type { KookConfig } from "./types.js";
+import { probeKookAccount } from "./probe.js";
 
 // 动态加载 WebSocket
 let wsModule: typeof import("ws") | null = null;
@@ -60,37 +61,42 @@ type ResolvedKookAccount = {
 function resolveKookAccount(params: { cfg: ClawdbotConfig; accountId?: string }): ResolvedKookAccount {
   const { cfg, accountId } = params;
   const resolvedAccountId = accountId ?? DEFAULT_ACCOUNT_ID;
-  const topLevel = (cfg.channels as Record<string, unknown>)?.kook;
-  const accountData = (topLevel as Record<string, unknown>)?.accounts;
-  const account = accountData ? (accountData as Record<string, unknown>)[resolvedAccountId] : null;
+  const kookCfg = cfg.channels?.kook as KookConfig | undefined;
+  const account = kookCfg?.accounts?.[resolvedAccountId];
 
-  const token = (account as Record<string, string>)?.token ?? (topLevel as Record<string, string>)?.token;
-  const name = (account as Record<string, string>)?.name ?? (topLevel as Record<string, string>)?.name;
-  const enabled = (account as Record<string, boolean>)?.enabled ?? (topLevel as Record<string, boolean>)?.enabled ?? true;
+  const token = account?.token ?? kookCfg?.token ?? process.env.KOOK_BOT_TOKEN;
+  const tokenSource = account?.token
+    ? "config"
+    : kookCfg?.token
+    ? "config"
+    : process.env.KOOK_BOT_TOKEN
+    ? "env"
+    : undefined;
+  const name = account?.name ?? kookCfg?.name;
+  const enabled = account?.enabled ?? kookCfg?.enabled ?? true;
 
   return {
     accountId: resolvedAccountId,
     name,
     enabled,
     token,
-    config: (account as Record<string, unknown>)?.config ?? {},
+    tokenSource,
+    config: account?.config ?? {},
   };
 }
 
 function listKookAccountIds(cfg: ClawdbotConfig): string[] {
-  const accounts = (cfg.channels as Record<string, unknown>)?.kook?.accounts;
-  if (!accounts) {
-    return Object.keys((cfg.channels as Record<string, unknown>)?.kook || {}).length > 0
-      ? [DEFAULT_ACCOUNT_ID]
-      : [];
+  const kookCfg = cfg.channels?.kook as KookConfig | undefined;
+  if (!kookCfg?.accounts) {
+    return Object.keys(kookCfg || {}).length > 0 ? [DEFAULT_ACCOUNT_ID] : [];
   }
-  return Object.keys(accounts as Record<string, unknown>);
+  return Object.keys(kookCfg.accounts);
 }
 
 function resolveDefaultKookAccountId(cfg: ClawdbotConfig): string {
-  const accounts = (cfg.channels as Record<string, unknown>)?.kook?.accounts;
-  if (accounts && Object.keys(accounts as Record<string, unknown>).length > 0) {
-    return Object.keys(accounts as Record<string, unknown>)[0];
+  const kookCfg = cfg.channels?.kook as KookConfig | undefined;
+  if (kookCfg?.accounts && Object.keys(kookCfg.accounts).length > 0) {
+    return Object.keys(kookCfg.accounts)[0];
   }
   return DEFAULT_ACCOUNT_ID;
 }
@@ -522,7 +528,35 @@ export const kookPlugin: ChannelPlugin<ResolvedKookAccount> = {
     blockStreamingCoalesceDefaults: { minChars: 1500, idleMs: 1000 },
   },
   reload: { configPrefixes: ["channels.kook"] },
-  configSchema: emptyPluginConfigSchema(),
+  configSchema: {
+    schema: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        enabled: { type: "boolean" },
+        token: { type: "string" },
+        name: { type: "string" },
+        dmPolicy: { type: "string", enum: ["open", "pairing", "allowlist"] },
+        allowFrom: { type: "array", items: { type: "string" } },
+        groupPolicy: { type: "string", enum: ["open", "allowlist", "disabled"] },
+        groupAllowFrom: { type: "array", items: { type: "string" } },
+        requireMention: { type: "boolean" },
+        textChunkLimit: { type: "integer", minimum: 1 },
+        accounts: {
+          type: "object",
+          additionalProperties: {
+            type: "object",
+            properties: {
+              enabled: { type: "boolean" },
+              token: { type: "string" },
+              name: { type: "string" },
+              config: { type: "object" },
+            },
+          },
+        },
+      },
+    },
+  },
   config: {
     listAccountIds: (cfg) => listKookAccountIds(cfg),
     resolveAccount: (cfg, accountId) => resolveKookAccount({ cfg, accountId }),
@@ -631,15 +665,7 @@ export const kookPlugin: ChannelPlugin<ResolvedKookAccount> = {
       if (!token) {
         return { ok: false, error: "bot token missing" };
       }
-      try {
-        const response = await fetch("https://www.kookapp.cn/api/v3/user/me", {
-          headers: { Authorization: `Bot ${token}` },
-        });
-        const data = await response.json();
-        return { ok: data.code === 0, user: data.data };
-      } catch (err) {
-        return { ok: false, error: String(err) };
-      }
+      return await probeKookAccount({ token });
     },
     buildAccountSnapshot: ({ account, runtime, probe }) => ({
       accountId: account.accountId,

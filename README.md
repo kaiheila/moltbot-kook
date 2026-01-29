@@ -7,22 +7,12 @@ Kook 聊天平台的 Clawdbot 通道插件。
 ### 方式一：从 npm 安装
 
 ```bash
-npm install moltbot-kook
+npm install @kookapp/moltbot-kook
 ```
 
-然后复制到 Clawdbot 扩展目录：
+然后作为明文插件加载到 Clawdbot 项目中（无需构建）。
 
-```bash
-# 全局安装
-mkdir -p ~/.clawdbot/extensions/kook
-cp -r node_modules/moltbot-kook/* ~/.clawdbot/extensions/kook/
-
-# 或在工作区安装
-mkdir -p /path/to/your/workspace/.clawdbot/extensions/kook
-cp -r node_modules/moltbot-kook/* /path/to/your/workspace/.clawdbot/extensions/kook/
-```
-
-### 方式二：克隆并链接（开发模式）
+### 方式二：本地开发模式
 
 ```bash
 # 克隆仓库
@@ -32,30 +22,52 @@ cd kook
 # 安装依赖
 npm install
 
-# 构建
-npm run build
-
-# 链接到 Clawdbot
-mkdir -p ~/.clawdbot/extensions/kook
-cp -r dist/* ~/.clawdbot/extensions/kook/
+# 作为明文插件加载（无需构建）
+# 在你的 Clawdbot 项目中引用此目录
 ```
 
 ## 配置
 
-在 Clawdbot 配置文件 (`~/.clawdbot/clawdbot.json`) 中添加：
+### 使用配置向导（推荐）
+
+运行 Clawdbot 配置向导：
+
+```bash
+clawdbot setup
+```
+
+选择 Kook 通道并按照提示输入：
+- **Bot Token**: 从 [Kook 开发者平台](https://developer.kookapp.cn/bot/) 获取
+- **DM 策略**: 选择私聊消息处理策略
+- **群组策略**: 选择群组/频道消息处理策略
+
+### 手动配置
+
+在 Clawdbot 配置文件中添加：
 
 ```json
 {
   "channels": {
     "kook": {
       "enabled": true,
-      "token": "你的机器人Token"
+      "token": "你的机器人Token",
+      "dmPolicy": "pairing",
+      "groupPolicy": "allowlist",
+      "groupAllowFrom": ["频道ID1", "频道ID2"],
+      "requireMention": true
     }
   }
 }
 ```
 
-机器人 Token 获取：https://developer.kookapp.cn/bot/
+### 使用环境变量
+
+```bash
+export KOOK_BOT_TOKEN="你的机器人Token"
+clawdbot gateway start
+```
+
+**获取 Bot Token**: https://developer.kookapp.cn/bot/
 
 ## 重启 Clawdbot
 
@@ -74,18 +86,14 @@ clawdbot gateway restart
 
 ## 开发
 
+此插件以明文方式运行，无需构建步骤：
+
 ```bash
 # 安装依赖
 npm install
 
-# 构建
-npm run build
-
-# 监听模式
-npm run dev
-
-# 构建后复制到 Clawdbot 测试
-cp -r dist/* ~/.clawdbot/extensions/kook/
+# 直接在你的 Clawdbot 项目中引用此插件目录
+# 修改代码后重启 Clawdbot 即可
 clawdbot gateway restart
 ```
 
@@ -96,7 +104,7 @@ clawdbot gateway restart
 # 登录 npm
 npm login
 
-# 发布
+# 发布（作为明文插件包，无需构建）
 npm publish
 
 # 或发布测试版本
@@ -108,16 +116,31 @@ npm publish --tag beta
 ```
 moltbot-kook/
 ├── src/
-│   ├── index.ts          # 插件入口
-│   ├── channel.ts        # 核心通道实现
-│   ├── runtime.ts        # 运行时工具
-│   └── plugin-sdk.d.ts   # 类型声明
-├── dist/                 # 构建输出
+│   ├── channel.ts        # 核心通道实现（消息处理、WebSocket）
+│   ├── runtime.ts        # 运行时管理
+│   ├── config-schema.ts  # 配置 Schema（Zod）
+│   ├── onboarding.ts     # 配置向导
+│   ├── probe.ts          # 连接测试
+│   ├── types.ts          # TypeScript 类型定义
+│   └── plugin-sdk.d.ts   # 插件 SDK 类型
+├── index.ts              # 插件入口（导出）
 ├── package.json
 ├── tsconfig.json
 ├── README.md
 └── LICENSE
 ```
+
+## 功能特性
+
+- ✅ WebSocket 实时连接
+- ✅ 私聊和频道消息支持
+- ✅ 配置向导（交互式设置）
+- ✅ 环境变量支持
+- ✅ 消息分块（自动处理长消息）
+- ✅ DM 策略配置（open/pairing/allowlist）
+- ✅ 群组策略配置（open/allowlist/disabled）
+- ✅ 连接状态监控
+- ✅ 自动重连机制
 
 ## License
 
