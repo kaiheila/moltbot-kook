@@ -1,227 +1,85 @@
 # moltbot-kook
 
-Kook 聊天平台的 Clawdbot 通道插件。
+Kook 聊天平台的 Moltbot/Clawdbot 通道插件。
 
 ## 安装
 
-### 方式一：从 npm 安装
-
 ```bash
-npm install @kookapp/moltbot-kook
-```
+# Moltbot 用户
+moltbot plugins install @kookapp/moltbot-kook
 
-然后作为明文插件加载到 Clawdbot 项目中（无需构建）。
-
-### 方式二：本地开发模式
-
-```bash
-# 克隆仓库
-git clone https://github.com/clawdbot/kook.git
-cd kook
-
-# 安装依赖
-npm install
-
-# 作为明文插件加载（无需构建）
-# 在你的 Clawdbot 项目中引用此目录
+# 或 Clawdbot 用户
+clawdbot plugins install @kookapp/moltbot-kook
 ```
 
 ## 配置
 
-### 使用配置向导（推荐）
+### 1. 获取 Kook Bot Token
 
-运行 Clawdbot 配置向导：
+访问 [Kook 开发者平台](https://developer.kookapp.cn/bot/) 创建机器人并获取 Bot Token。
 
-```bash
-clawdbot setup
+### 2. 通过 Web 界面配置（推荐）
+
+打开 Moltbot 配置页面：
+
+```
+http://127.0.0.1:18789/chat
 ```
 
-选择 Kook 通道并按照提示输入：
-- **Bot Token**: 从 [Kook 开发者平台](https://developer.kookapp.cn/bot/) 获取
-- **DM 策略**: 选择私聊消息处理策略
-- **群组策略**: 选择群组/频道消息处理策略
+在设置中找到 Kook 通道，配置以下参数：
 
-### 手动配置
+| 配置项 | 必填 | 说明 |
+|--------|------|------|
+| `token` | **是** | Kook Bot Token |
+| `allowedUserId` | **强烈推荐** | 只允许此用户 ID 控制机器人（安全设置） |
 
-在 Clawdbot 配置文件中添加：
+**如何获取你的用户 ID**：
+1. kook - 个人设置 - 高级设置 - 开发者模式 - 打开；kook 服务器频道中 右键自己的头像 - 复制ID 即可；
+2. 或者给机器人发送一条消息，在日志中查看 `authorId`。
 
-```json
-{
-  "channels": {
-    "kook": {
-      "enabled": true,
-      "token": "你的机器人Token",
-      "allowedUserId": "1234567890",
-      "dmPolicy": "pairing",
-      "groupPolicy": "allowlist",
-      "groupAllowFrom": ["频道ID1", "频道ID2"],
-      "requireMention": true
-    }
-  }
-}
-```
-
-**重要安全配置**：
-- `allowedUserId`: **强烈推荐设置**，指定唯一允许控制此机器人的用户 ID。只有该用户的消息会被处理，其他用户的消息会被忽略。适用于远程控制场景。
-
-### 使用环境变量
+### 3. 或使用命令行配置
 
 ```bash
-export KOOK_BOT_TOKEN="你的机器人Token"
-clawdbot gateway start
+# Moltbot
+moltbot config set channels.kook.token "你的Bot Token"
+moltbot config set channels.kook.allowedUserId "你的用户ID"
+moltbot config set channels.kook.enabled true
+
+# Clawdbot
+clawdbot config set channels.kook.token "你的Bot Token"
+clawdbot config set channels.kook.allowedUserId "你的用户ID"
+clawdbot config set channels.kook.enabled true
 ```
 
-**获取 Bot Token**: https://developer.kookapp.cn/bot/
-
-## 重启 Clawdbot
-
-安装和配置完成后：
+### 4. 重启服务
 
 ```bash
+# Moltbot
+moltbot gateway restart
+
+# Clawdbot
 clawdbot gateway restart
 ```
 
-## 使用
+## 配置项说明
 
-配置完成后，Clawdbot 将自动：
-- 通过 WebSocket 连接到 Kook
-- 监听频道和私聊消息
-- 将回复发送回 Kook
+核心配置（通过 Web 界面或命令行配置）：
 
-## 开发
-
-此插件以明文方式运行，无需构建步骤：
-
-```bash
-# 安装依赖
-npm install
-
-# 直接在你的 Clawdbot 项目中引用此插件目录
-# 修改代码后重启 Clawdbot 即可
-clawdbot gateway restart
-```
-
-## 发布到 npm
-
-```bash
-# 更新 package.json 中的版本号
-# 登录 npm
-npm login
-
-# 发布（作为明文插件包，无需构建）
-npm publish
-
-# 或发布测试版本
-npm publish --tag beta
-```
-
-## 目录结构
-
-```
-moltbot-kook/
-├── src/
-│   ├── channel.ts        # 核心通道实现（消息处理、WebSocket）
-│   ├── runtime.ts        # 运行时管理
-│   ├── config-schema.ts  # 配置 Schema（Zod）
-│   ├── onboarding.ts     # 配置向导
-│   ├── probe.ts          # 连接测试
-│   ├── types.ts          # TypeScript 类型定义
-│   └── plugin-sdk.d.ts   # 插件 SDK 类型
-├── index.ts              # 插件入口（导出）
-├── package.json
-├── tsconfig.json
-├── README.md
-└── LICENSE
+```yaml
+channels:
+  kook:
+    enabled: true
+    token: "你的Bot Token"         # 必填
+    allowedUserId: "你的用户ID"    # 强烈推荐（安全设置）
 ```
 
 ## 功能特性
 
 - ✅ WebSocket 实时连接
 - ✅ 私聊和频道消息支持
-- ✅ 配置向导（交互式设置）
-- ✅ 环境变量支持
-- ✅ 消息分块（自动处理长消息）
-- ✅ DM 策略配置（open/pairing/allowlist）
-- ✅ 群组策略配置（open/allowlist/disabled）
 - ✅ **用户白名单**（allowedUserId）- 仅允许指定用户控制
-- ✅ 连接状态监控
+- ✅ 消息分块（自动处理长消息）
 - ✅ 自动重连机制
-
-## 配置项详解
-
-### 所有可配置的用户输入配置项
-
-| 配置项 | 类型 | 必填 | 默认值 | 说明 |
-|--------|------|------|--------|------|
-| `enabled` | boolean | 否 | `true` | 是否启用 Kook 通道 |
-| `token` | string | **是** | - | Kook Bot Token（或使用环境变量 `KOOK_BOT_TOKEN`） |
-| `name` | string | 否 | - | 账户名称（用于标识） |
-| `allowedUserId` | string | **强烈推荐** | - | **安全配置**：只允许此用户 ID 的消息被处理，其他用户消息会被忽略 |
-| `dmPolicy` | string | 否 | `"pairing"` | 私聊消息策略：<br/>• `"open"` - 开放（需配合 allowFrom: ["*"]）<br/>• `"pairing"` - 配对模式<br/>• `"allowlist"` - 白名单模式 |
-| `allowFrom` | string[] | 否 | `[]` | 私聊白名单（用户 ID 列表），配合 dmPolicy 使用 |
-| `groupPolicy` | string | 否 | `"allowlist"` | 群组/频道消息策略：<br/>• `"open"` - 开放（需 @提及）<br/>• `"allowlist"` - 白名单模式<br/>• `"disabled"` - 禁用群组消息 |
-| `groupAllowFrom` | string[] | 否 | `[]` | 群组/频道白名单（频道 ID 列表） |
-| `requireMention` | boolean | 否 | `true` | 群组中是否需要 @提及机器人 |
-| `textChunkLimit` | number | 否 | `2000` | 单条消息最大字符数，超出自动分块 |
-
-### 配置示例
-
-#### 1. 远程控制场景（推荐配置）
-
-```json
-{
-  "channels": {
-    "kook": {
-      "enabled": true,
-      "token": "你的Bot Token",
-      "allowedUserId": "1234567890",
-      "dmPolicy": "open",
-      "allowFrom": ["*"],
-      "groupPolicy": "disabled"
-    }
-  }
-}
-```
-
-**说明**：只允许用户 ID `1234567890` 通过私聊控制，禁用所有群组消息。
-
-#### 2. 团队协作场景
-
-```json
-{
-  "channels": {
-    "kook": {
-      "enabled": true,
-      "token": "你的Bot Token",
-      "dmPolicy": "allowlist",
-      "allowFrom": ["1234567890", "9876543210"],
-      "groupPolicy": "allowlist",
-      "groupAllowFrom": ["频道ID1", "频道ID2"],
-      "requireMention": true
-    }
-  }
-}
-```
-
-**说明**：允许多个用户私聊，在指定频道中需要 @提及才响应。
-
-#### 3. 公开服务场景
-
-```json
-{
-  "channels": {
-    "kook": {
-      "enabled": true,
-      "token": "你的Bot Token",
-      "dmPolicy": "pairing",
-      "groupPolicy": "open",
-      "requireMention": true
-    }
-  }
-}
-```
-
-**说明**：私聊需要配对，群组开放但需要 @提及。
 
 ## License
 
