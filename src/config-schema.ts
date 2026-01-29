@@ -9,6 +9,7 @@ export const KookConfigSchema = z
     enabled: z.boolean().optional(),
     token: z.string().optional(),
     name: z.string().optional(),
+    allowedUserId: z.string().optional(),
     dmPolicy: DmPolicySchema.optional().default("pairing"),
     allowFrom: z.array(z.string()).optional(),
     groupPolicy: GroupPolicySchema.optional().default("allowlist"),
@@ -23,6 +24,7 @@ export const KookConfigSchema = z
             enabled: z.boolean().optional(),
             token: z.string().optional(),
             name: z.string().optional(),
+            allowedUserId: z.string().optional(),
             config: z.record(z.string(), z.unknown()).optional(),
           })
           .optional(),

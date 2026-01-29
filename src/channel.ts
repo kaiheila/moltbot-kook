@@ -55,6 +55,7 @@ type ResolvedKookAccount = {
   enabled: boolean;
   token?: string;
   tokenSource?: string;
+  allowedUserId?: string;
   config: Record<string, unknown>;
 };
 
@@ -74,6 +75,7 @@ function resolveKookAccount(params: { cfg: ClawdbotConfig; accountId?: string })
     : undefined;
   const name = account?.name ?? kookCfg?.name;
   const enabled = account?.enabled ?? kookCfg?.enabled ?? true;
+  const allowedUserId = account?.allowedUserId ?? kookCfg?.allowedUserId;
 
   return {
     accountId: resolvedAccountId,
@@ -81,6 +83,7 @@ function resolveKookAccount(params: { cfg: ClawdbotConfig; accountId?: string })
     enabled,
     token,
     tokenSource,
+    allowedUserId,
     config: account?.config ?? {},
   };
 }
@@ -281,16 +284,24 @@ async function monitorKookWebSocket(opts: {
     // 只处理文本消息
     if (type !== 1 && type !== 9) return;
 
+    const runtime = getKookRuntime();
+    const cfg = runtime.config.loadConfig();
+    const account = resolveKookAccount({ cfg });
+
+    // 安全检查：如果配置了 allowedUserId，只允许该用户的消息
+    if (account.allowedUserId && account.allowedUserId.trim()) {
+      if (authorId !== account.allowedUserId.trim()) {
+        log(`Message from ${authorId} rejected: not in allowedUserId (${account.allowedUserId})`);
+        return;
+      }
+    }
+
     const author = extra?.author as Record<string, unknown> | undefined;
     const senderName = (author?.username as string) ?? authorId;
 
     const chatType = getKookChatType(channelType);
     const bodyText = content.trim();
     if (!bodyText) return;
-
-    const runtime = getKookRuntime();
-    const cfg = runtime.config.loadConfig();
-    const account = resolveKookAccount({ cfg });
 
     // 权限检查
     const groupPolicy = (account.config.groupPolicy as string) ?? "allowlist";
@@ -536,6 +547,7 @@ export const kookPlugin: ChannelPlugin<ResolvedKookAccount> = {
         enabled: { type: "boolean" },
         token: { type: "string" },
         name: { type: "string" },
+        allowedUserId: { type: "string" },
         dmPolicy: { type: "string", enum: ["open", "pairing", "allowlist"] },
         allowFrom: { type: "array", items: { type: "string" } },
         groupPolicy: { type: "string", enum: ["open", "allowlist", "disabled"] },
@@ -550,6 +562,7 @@ export const kookPlugin: ChannelPlugin<ResolvedKookAccount> = {
               enabled: { type: "boolean" },
               token: { type: "string" },
               name: { type: "string" },
+              allowedUserId: { type: "string" },
               config: { type: "object" },
             },
           },

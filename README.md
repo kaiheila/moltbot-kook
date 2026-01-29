@@ -51,6 +51,7 @@ clawdbot setup
     "kook": {
       "enabled": true,
       "token": "你的机器人Token",
+      "allowedUserId": "1234567890",
       "dmPolicy": "pairing",
       "groupPolicy": "allowlist",
       "groupAllowFrom": ["频道ID1", "频道ID2"],
@@ -59,6 +60,9 @@ clawdbot setup
   }
 }
 ```
+
+**重要安全配置**：
+- `allowedUserId`: **强烈推荐设置**，指定唯一允许控制此机器人的用户 ID。只有该用户的消息会被处理，其他用户的消息会被忽略。适用于远程控制场景。
 
 ### 使用环境变量
 
@@ -139,8 +143,85 @@ moltbot-kook/
 - ✅ 消息分块（自动处理长消息）
 - ✅ DM 策略配置（open/pairing/allowlist）
 - ✅ 群组策略配置（open/allowlist/disabled）
+- ✅ **用户白名单**（allowedUserId）- 仅允许指定用户控制
 - ✅ 连接状态监控
 - ✅ 自动重连机制
+
+## 配置项详解
+
+### 所有可配置的用户输入配置项
+
+| 配置项 | 类型 | 必填 | 默认值 | 说明 |
+|--------|------|------|--------|------|
+| `enabled` | boolean | 否 | `true` | 是否启用 Kook 通道 |
+| `token` | string | **是** | - | Kook Bot Token（或使用环境变量 `KOOK_BOT_TOKEN`） |
+| `name` | string | 否 | - | 账户名称（用于标识） |
+| `allowedUserId` | string | **强烈推荐** | - | **安全配置**：只允许此用户 ID 的消息被处理，其他用户消息会被忽略 |
+| `dmPolicy` | string | 否 | `"pairing"` | 私聊消息策略：<br/>• `"open"` - 开放（需配合 allowFrom: ["*"]）<br/>• `"pairing"` - 配对模式<br/>• `"allowlist"` - 白名单模式 |
+| `allowFrom` | string[] | 否 | `[]` | 私聊白名单（用户 ID 列表），配合 dmPolicy 使用 |
+| `groupPolicy` | string | 否 | `"allowlist"` | 群组/频道消息策略：<br/>• `"open"` - 开放（需 @提及）<br/>• `"allowlist"` - 白名单模式<br/>• `"disabled"` - 禁用群组消息 |
+| `groupAllowFrom` | string[] | 否 | `[]` | 群组/频道白名单（频道 ID 列表） |
+| `requireMention` | boolean | 否 | `true` | 群组中是否需要 @提及机器人 |
+| `textChunkLimit` | number | 否 | `2000` | 单条消息最大字符数，超出自动分块 |
+
+### 配置示例
+
+#### 1. 远程控制场景（推荐配置）
+
+```json
+{
+  "channels": {
+    "kook": {
+      "enabled": true,
+      "token": "你的Bot Token",
+      "allowedUserId": "1234567890",
+      "dmPolicy": "open",
+      "allowFrom": ["*"],
+      "groupPolicy": "disabled"
+    }
+  }
+}
+```
+
+**说明**：只允许用户 ID `1234567890` 通过私聊控制，禁用所有群组消息。
+
+#### 2. 团队协作场景
+
+```json
+{
+  "channels": {
+    "kook": {
+      "enabled": true,
+      "token": "你的Bot Token",
+      "dmPolicy": "allowlist",
+      "allowFrom": ["1234567890", "9876543210"],
+      "groupPolicy": "allowlist",
+      "groupAllowFrom": ["频道ID1", "频道ID2"],
+      "requireMention": true
+    }
+  }
+}
+```
+
+**说明**：允许多个用户私聊，在指定频道中需要 @提及才响应。
+
+#### 3. 公开服务场景
+
+```json
+{
+  "channels": {
+    "kook": {
+      "enabled": true,
+      "token": "你的Bot Token",
+      "dmPolicy": "pairing",
+      "groupPolicy": "open",
+      "requireMention": true
+    }
+  }
+}
+```
+
+**说明**：私聊需要配对，群组开放但需要 @提及。
 
 ## License
 
