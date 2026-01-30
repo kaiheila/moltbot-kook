@@ -238,8 +238,8 @@ async function monitorKookWebSocket(opts: {
         const code = d?.code as number ?? 40100;
         if (code === 0) {
           sessionId = (d?.session_id as string) ?? "";
-          selfUserId = String(d?.user_id ?? "");
-          log(`Kook connected, session: ${sessionId}, userId: ${selfUserId}`);
+          // selfUserId = String(d?.user_id ?? "");
+          log(`Kook connected, session: ${sessionId}`);
           setStatus(STATUS_CONNECTED);
           startHeartbeat();
         } else {
@@ -277,6 +277,30 @@ async function monitorKookWebSocket(opts: {
     const msgId = data.msg_id as string;
     const extra = data.extra as Record<string, unknown>;
 
+    const {
+      // type,
+      code,
+      guild_id,
+      guild_type,
+      channel_name,
+      // author,
+      visible_only,
+      mention,
+      mention_no_at,
+      mention_all,
+      mention_roles,
+      mention_here,
+      nav_channels,
+      kmarkdown,
+      emoji,
+      preview_content,
+      channel_type,
+      last_msg_content,
+      send_msg_device
+    } = extra;
+
+    // 只处理 @自己的消息
+    if (mention != selfUserId) return
     // 跳过系统消息
     if (type === 255) return;
     // 跳过自己发的消息
