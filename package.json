@@ -1,7 +1,7 @@
 {
   "name": "@kookapp/moltbot-kook",
   "version": "1.0.2",
-  "description": "Kook channel plugin for Clawdbot",
+  "description": "Kook channel plugin for moltbot / Clawdbot / OpenClaw",
   "type": "module",
   "main": "index.ts",
   "exports": {

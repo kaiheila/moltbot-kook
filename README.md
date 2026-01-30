@@ -1,6 +1,6 @@
 # moltbot-kook
 
-Kook 聊天平台的 Moltbot/Clawdbot 通道插件。
+Kook 聊天平台的 Moltbot/Clawdbot/OpenClaw 通道插件。
 
 ## 安装
 
@@ -10,6 +10,9 @@ moltbot plugins install @kookapp/moltbot-kook
 
 # 或 Clawdbot 用户
 clawdbot plugins install @kookapp/moltbot-kook
+
+# 或 OpenClaw 用户
+openclaw plugins install @kookapp/moltbot-kook
 ```
 
 ## 配置
@@ -49,6 +52,11 @@ moltbot config set channels.kook.enabled true
 clawdbot config set channels.kook.token "你的Bot Token"
 clawdbot config set channels.kook.allowedUserId "你的用户ID"
 clawdbot config set channels.kook.enabled true
+
+# OpenClaw
+openclaw config set channels.kook.token "你的Bot Token"
+openclaw config set channels.kook.allowedUserId "你的用户ID"
+openclaw config set channels.kook.enabled true
 ```
 
 ### 4. 重启服务
@@ -59,6 +67,9 @@ moltbot gateway restart
 
 # Clawdbot
 clawdbot gateway restart
+
+# OpenClaw
+openclaw gateway restart
 ```
 
 ## 配置项说明
