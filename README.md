@@ -1,18 +1,15 @@
-# moltbot-kook
+# openclaw-kook
 
 Kook 聊天平台的 Moltbot/Clawdbot/OpenClaw 通道插件。
+
+> **说明**：本文下方命令示例统一以 **OpenClaw** 为例（`openclaw ...`）。如果你安装的是 **Moltbot** / **Clawdbot** 版本，把命令中的 `openclaw` 替换成 `moltbot` / `clawdbot` 即可。
+
+> **迁移提示**：旧包名为 `@kookapp/moltbot-kook`，已迁移到 `@kookapp/openclaw-kook`。如果你之前安装过旧包，请先卸载旧包，再安装新包。
 
 ## 安装
 
 ```bash
-# Moltbot 用户
-moltbot plugins install @kookapp/moltbot-kook
-
-# 或 Clawdbot 用户
-clawdbot plugins install @kookapp/moltbot-kook
-
-# 或 OpenClaw 用户
-openclaw plugins install @kookapp/moltbot-kook
+openclaw plugins install @kookapp/openclaw-kook
 ```
 
 ## 配置
@@ -23,7 +20,7 @@ openclaw plugins install @kookapp/moltbot-kook
 
 ### 2. 通过 Web 界面配置（推荐）
 
-打开 Moltbot 配置页面：
+打开配置页面：
 
 ```
 http://127.0.0.1:18789/chat
@@ -43,17 +40,6 @@ http://127.0.0.1:18789/chat
 ### 3. 或使用命令行配置
 
 ```bash
-# Moltbot
-moltbot config set channels.kook.token "你的Bot Token"
-moltbot config set channels.kook.allowedUserId "你的用户ID"
-moltbot config set channels.kook.enabled true
-
-# Clawdbot
-clawdbot config set channels.kook.token "你的Bot Token"
-clawdbot config set channels.kook.allowedUserId "你的用户ID"
-clawdbot config set channels.kook.enabled true
-
-# OpenClaw
 openclaw config set channels.kook.token "你的Bot Token"
 openclaw config set channels.kook.allowedUserId "你的用户ID"
 openclaw config set channels.kook.enabled true
@@ -62,13 +48,6 @@ openclaw config set channels.kook.enabled true
 ### 4. 重启服务
 
 ```bash
-# Moltbot
-moltbot gateway restart
-
-# Clawdbot
-clawdbot gateway restart
-
-# OpenClaw
 openclaw gateway restart
 ```
 

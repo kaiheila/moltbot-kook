@@ -13,7 +13,7 @@ export {
 } from "./src/config-keys.js";
 
 const plugin = {
-  id: "moltbot-kook",
+  id: "openclaw-kook",
   name: "Kook",
   description: "Kook channel plugin",
   configSchema: emptyPluginConfigSchema(),

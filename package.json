@@ -1,7 +1,7 @@
 {
-  "name": "@kookapp/moltbot-kook",
+  "name": "@kookapp/openclaw-kook",
   "version": "1.0.2",
-  "description": "Kook channel plugin for moltbot / Clawdbot / OpenClaw",
+  "description": "Kook channel plugin for OpenClaw",
   "type": "module",
   "main": "index.ts",
   "exports": {
@@ -14,7 +14,7 @@
       "./index.ts"
     ],
     "channel": {
-      "id": "moltbot-kook",
+      "id": "openclaw-kook",
       "label": "Kook",
       "selectionLabel": "Kook",
       "docsPath": "/channels/kook",
@@ -23,7 +23,7 @@
       "order": 80
     },
     "install": {
-      "npmSpec": "@kookapp/moltbot-kook",
+      "npmSpec": "@kookapp/openclaw-kook",
       "localPath": ".",
       "defaultChoice": "npm"
     }
@@ -37,6 +37,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
+    "agent",
+    "openclaw",
     "clawdbot",
     "moltbot",
     "kook",
@@ -48,12 +50,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/clawdbot/kook.git"
+    "url": "git+https://github.com/kaiheila/openclaw-kook.git"
   },
   "bugs": {
-    "url": "https://github.com/clawdbot/kook/issues"
+    "url": "https://github.com/kaiheila/openclaw-kook/issues"
   },
-  "homepage": "https://github.com/clawdbot/kook",
+  "homepage": "https://github.com/kaiheila/openclaw-kook",
   "peerDependencies": {
     "clawdbot": ">=2026.1.0"
   },
