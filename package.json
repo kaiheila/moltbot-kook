@@ -1,6 +1,6 @@
 {
   "name": "@kookapp/openclaw-kook",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Kook channel plugin for OpenClaw",
   "type": "module",
   "main": "index.ts",
@@ -9,7 +9,7 @@
       "import": "./index.ts"
     }
   },
-  "clawdbot": {
+  "openclaw": {
     "extensions": [
       "./index.ts"
     ],
@@ -31,6 +31,7 @@
   "files": [
     "index.ts",
     "src",
+    "openclaw.plugin.json",
     "clawdbot.plugin.json"
   ],
   "scripts": {
@@ -57,7 +58,7 @@
   },
   "homepage": "https://github.com/kaiheila/openclaw-kook",
   "peerDependencies": {
-    "clawdbot": ">=2026.1.0"
+    "openclaw": ">=2026.1.0"
   },
   "dependencies": {
     "ws": "^8.19.0",

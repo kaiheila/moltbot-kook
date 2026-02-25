@@ -1,6 +1,6 @@
 # openclaw-kook
 
-Kook 聊天平台的 Moltbot/Clawdbot/OpenClaw 通道插件。
+Kook 聊天平台的 OpenClaw 通道插件。
 
 > **说明**：本文下方命令示例统一以 **OpenClaw** 为例（`openclaw ...`）。如果你安装的是 **Moltbot** / **Clawdbot** 版本，把命令中的 `openclaw` 替换成 `moltbot` / `clawdbot` 即可。
 

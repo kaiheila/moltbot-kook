@@ -1,7 +1,7 @@
-// Type declarations for clawdbot/plugin-sdk
+// Type declarations for openclaw/plugin-sdk
 // These are minimal type definitions for building the plugin
 
-declare module 'clawdbot/plugin-sdk' {
+declare module 'openclaw/plugin-sdk' {
   export interface PluginRuntime {
     runtime: string;
     config: {
@@ -48,9 +48,12 @@ declare module 'clawdbot/plugin-sdk' {
     error?(message: string, ...args: unknown[]): void;
   }
 
-  export interface ClawdbotConfig {
+  export interface OpenClawConfig {
     channels?: Record<string, unknown>;
   }
+  
+  /** @deprecated Use OpenClawConfig instead */
+  export type ClawdbotConfig = OpenClawConfig;
 
   export interface ReplyPayload {
     text?: string;

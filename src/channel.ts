@@ -1,4 +1,4 @@
-import type { ClawdbotConfig, ReplyPayload, RuntimeEnv } from "clawdbot/plugin-sdk";
+import type { OpenClawConfig, ReplyPayload, RuntimeEnv } from "openclaw/plugin-sdk";
 import {
   applyAccountNameToChannelSection,
   DEFAULT_ACCOUNT_ID,
@@ -8,7 +8,7 @@ import {
   normalizeAccountId,
   setAccountEnabledInConfigSection,
   type ChannelPlugin,
-} from "clawdbot/plugin-sdk";
+} from "openclaw/plugin-sdk";
 
 import { getKookRuntime } from "./runtime.js";
 import type { KookConfig } from "./types.js";
@@ -59,20 +59,14 @@ type ResolvedKookAccount = {
   config: Record<string, unknown>;
 };
 
-function resolveKookAccount(params: { cfg: ClawdbotConfig; accountId?: string }): ResolvedKookAccount {
+function resolveKookAccount(params: { cfg: OpenClawConfig; accountId?: string }): ResolvedKookAccount {
   const { cfg, accountId } = params;
   const resolvedAccountId = accountId ?? DEFAULT_ACCOUNT_ID;
   const kookCfg = cfg.channels?.kook as KookConfig | undefined;
   const account = kookCfg?.accounts?.[resolvedAccountId];
 
-  const token = account?.token ?? kookCfg?.token ?? process.env.KOOK_BOT_TOKEN;
-  const tokenSource = account?.token
-    ? "config"
-    : kookCfg?.token
-    ? "config"
-    : process.env.KOOK_BOT_TOKEN
-    ? "env"
-    : undefined;
+  const token = account?.token ?? kookCfg?.token;
+  const tokenSource = (account?.token || kookCfg?.token) ? "config" : undefined;
   const name = account?.name ?? kookCfg?.name;
   const enabled = account?.enabled ?? kookCfg?.enabled ?? true;
   const allowedUserId = account?.allowedUserId ?? kookCfg?.allowedUserId;
@@ -88,7 +82,7 @@ function resolveKookAccount(params: { cfg: ClawdbotConfig; accountId?: string })
   };
 }
 
-function listKookAccountIds(cfg: ClawdbotConfig): string[] {
+function listKookAccountIds(cfg: OpenClawConfig): string[] {
   const kookCfg = cfg.channels?.kook as KookConfig | undefined;
   if (!kookCfg?.accounts) {
     return Object.keys(kookCfg || {}).length > 0 ? [DEFAULT_ACCOUNT_ID] : [];
@@ -96,7 +90,7 @@ function listKookAccountIds(cfg: ClawdbotConfig): string[] {
   return Object.keys(kookCfg.accounts);
 }
 
-function resolveDefaultKookAccountId(cfg: ClawdbotConfig): string {
+function resolveDefaultKookAccountId(cfg: OpenClawConfig): string {
   const kookCfg = cfg.channels?.kook as KookConfig | undefined;
   if (kookCfg?.accounts && Object.keys(kookCfg.accounts).length > 0) {
     return Object.keys(kookCfg.accounts)[0];
@@ -147,7 +141,7 @@ async function sendMessageKook(
 async function monitorKookWebSocket(opts: {
   botToken: string;
   accountId: string;
-  config: ClawdbotConfig;
+  config: OpenClawConfig;
   abortSignal?: AbortSignal;
   onStatus: (status: Record<string, unknown>) => void;
   log: (...args: unknown[]) => void;

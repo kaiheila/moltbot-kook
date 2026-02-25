@@ -1,5 +1,5 @@
-import type { ClawdbotPluginApi } from "clawdbot/plugin-sdk";
-import { emptyPluginConfigSchema } from "clawdbot/plugin-sdk";
+import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
+import { emptyPluginConfigSchema } from "openclaw/plugin-sdk";
 import { kookPlugin } from "./src/channel.js";
 import { setKookRuntime } from "./src/runtime.js";
 
@@ -17,7 +17,7 @@ const plugin = {
   name: "Kook",
   description: "Kook channel plugin",
   configSchema: emptyPluginConfigSchema(),
-  register(api: ClawdbotPluginApi) {
+  register(api: OpenClawPluginApi) {
     setKookRuntime(api.runtime);
     api.registerChannel({ plugin: kookPlugin });
   },
